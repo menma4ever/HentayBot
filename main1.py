@@ -4,6 +4,9 @@ import json
 import os
 from datetime import datetime, timedelta
 import time
+from keep_alive import keep_alive
+
+keep_alive()
 
 # Bot tokeningizni kiritishingiz kerak
 bot = telebot.TeleBot('7319299432:AAFckpwgsiXqUKQGE7xmNdBYYct4faZg1ow')
