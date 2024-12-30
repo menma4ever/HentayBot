@@ -216,7 +216,7 @@ def process_episode_link(message, anime, anime_id, episode_number, anime_data):
 
 
 
-def process_add_new_anime(message, anime_id):
+def process_add_new_anime(message, anime_id, anime_data):
     if message.text.strip().lower() == 'yes':
         bot.reply_to(message, "Anime nomini kiriting:")
         bot.register_next_step_handler(message, process_new_anime_name, anime_id)
