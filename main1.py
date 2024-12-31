@@ -263,7 +263,8 @@ def process_new_anime_link(message, anime_id, anime_name, episodes, country, lan
     new_anime = {
         "id": int(anime_id),
         "nomi": anime_name,
-        "qismi_soni": episodes,
+        "qismi": int(episodes),
+        "qismi_soni": int(episodes),
         "davlat": country,
         "tili": language,
         "yili": year,
