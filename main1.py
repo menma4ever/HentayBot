@@ -270,7 +270,7 @@ def process_new_anime_link(message, anime_id, anime_name, episodes, country, lan
         "janri": genre,
         "qidirishlar_soni": 0,
         "pfp": pfp,
-        "qismi_soni": 1,
+        "qismi_soni": episodes,
         "1": link
     }
 
