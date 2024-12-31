@@ -216,7 +216,7 @@ def process_episode_link(message, anime, anime_id, episode_number, anime_data):
 
 
 
-def process_add_new_anime(message, anime_id, anime_data):
+def process_add_new_anime(message, anime_id):
     if message.text.strip().lower() == 'yes':
         bot.reply_to(message, "Anime nomini kiriting:")
         bot.register_next_step_handler(message, process_new_anime_name, anime_id)
@@ -263,14 +263,13 @@ def process_new_anime_link(message, anime_id, anime_name, episodes, country, lan
     new_anime = {
         "id": int(anime_id),
         "nomi": anime_name,
-        "qismi": episodes,
+        "qismi_soni": episodes,
         "davlat": country,
         "tili": language,
         "yili": year,
         "janri": genre,
         "qidirishlar_soni": 0,
         "pfp": pfp,
-        "qismi_soni": episodes,
         "1": link
     }
 
@@ -1063,18 +1062,4 @@ def handle_ad_content(message):
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 bot.polling()
-    
