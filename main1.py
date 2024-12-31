@@ -189,7 +189,7 @@ def process_anime_id(message):
         bot.register_next_step_handler(message, process_add_episode_number, anime, anime_id, anime_data)
     else:
         bot.reply_to(message, "Yangi anime qo'shamizmi? (yes/no)")
-        bot.register_next_step_handler(message, process_add_new_anime, anime_id, anime_data)
+        bot.register_next_step_handler(message, process_add_new_anime, anime_id)
 
 
 def process_add_episode_number(message, anime, anime_id, anime_data):
@@ -229,7 +229,7 @@ def process_new_anime_name(message, anime_id):
     bot.register_next_step_handler(message, process_new_anime_episodes, anime_id, anime_name)
 
 def process_new_anime_episodes(message, anime_id, anime_name):
-    episodes = int(message.text.strip())
+    episodes = message.text.strip()
     bot.reply_to(message, "Qaysi davlat?")
     bot.register_next_step_handler(message, process_new_anime_country, anime_id, anime_name, episodes)
 
@@ -263,8 +263,8 @@ def process_new_anime_link(message, anime_id, anime_name, episodes, country, lan
     new_anime = {
         "id": int(anime_id),
         "nomi": anime_name,
-        "qismi": int(episodes),
         "qismi_soni": int(episodes),
+        "qismi": int(episodes),
         "davlat": country,
         "tili": language,
         "yili": year,
@@ -1064,4 +1064,7 @@ def handle_ad_content(message):
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
 
+
+
 bot.polling()
+    
