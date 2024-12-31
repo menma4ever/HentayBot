@@ -376,9 +376,6 @@ def bankai_command(message):
 
 
 
-
-
-
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     chat_id = message.chat.id
@@ -420,13 +417,17 @@ def send_welcome(message):
         markup = types.InlineKeyboardMarkup(row_width=2)
         join_button1 = types.InlineKeyboardButton(text="Kanal", url=f"https://t.me/{channel_id1[1:]}")
         join_button2 = types.InlineKeyboardButton(text="Chat", url=f"https://t.me/{channel_id2[1:]}")
-        joirl="https://www.instagram.com/_senpai.1707_"
+        confirm_button = types.InlineKeyboardButton(text="Tasdiqlash", callback_data="confirm")
+
         markup.add(join_button1)
         markup.add(join_button2)
-        markup.add(link)
         markup.add(confirm_button)
 
         bot.send_message(chat_id, "Iltimos, foydalanishdan oldin quyidagi kanallarga obuna bo'ling:", reply_markup=markup)
+
+
+
+
 
 # Check user subscription status
 def check_user_joined_channel(user_id, channel_id):
