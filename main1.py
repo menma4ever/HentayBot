@@ -376,10 +376,14 @@ def bankai_command(message):
 
 
 
-
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     chat_id = message.chat.id
+
+    if message.chat.type != 'private':
+        bot.send_message(chat_id, "Men faqat Private ishlayman.")
+        return
+
     user_id = str(message.from_user.id)
 
     # user_data.json faylini ochish
@@ -426,10 +430,6 @@ def send_welcome(message):
 
         bot.send_message(chat_id, "Iltimos, foydalanishdan oldin quyidagi kanallarga obuna bo'ling:", reply_markup=markup)
 
-
-
-
-
 # Check user subscription status
 def check_user_joined_channel(user_id, channel_id):
     try:
@@ -455,6 +455,8 @@ def save_user_data(user_id, user_name, user_username):
             }
             file.seek(0)
             json.dump(data, file, indent=4)
+
+
 
 @bot.callback_query_handler(func=lambda call: call.data == "confirm_subscription")
 def confirm_subscription(call):
@@ -797,7 +799,7 @@ def send_vip_channel_info(message):
 
 
     if joined_channel1 and joined_channel2:
-        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 15,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
+        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 30,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
     else:
         message_text = (
             "Iltimos, ushbu xizmatdan foydalanish uchun ikkala kanalga ham obuna bo'ling:\n"
@@ -904,7 +906,7 @@ def show_profile(message):
         )
     else:
         inline_keyboard = telebot.types.InlineKeyboardMarkup()
-        private_button = telebot.types.InlineKeyboardButton("Botga O'tish", url=f't.me/{bot.get_me().username}?start')
+        private_button = telebot.types.InlineKeyboardButton("Botga O'tish", url=f't.me/hentay_uz_bot')
         inline_keyboard.add(private_button)
         profile_message = "Siz botda registratsiya qilmagansiz 😊"
 
@@ -1064,7 +1066,4 @@ def handle_ad_content(message):
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
 
-
-
 bot.polling()
-    
