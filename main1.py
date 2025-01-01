@@ -8,6 +8,7 @@ from keep_alive import keep_alive
 
 keep_alive()
 
+
 # Bot tokeningizni kiritishingiz kerak
 bot = telebot.TeleBot('7319299432:AAFckpwgsiXqUKQGE7xmNdBYYct4faZg1ow')
 
@@ -402,10 +403,12 @@ def send_welcome(message):
     # Kanalga obuna bo'lganligini tekshirish
     channel_id1 = '@hentay_uz_official'
     channel_id2 = '@hentay_uz_chat'
+    channel_id3 = '@Anime_chat_aki'
     joined_channel1 = check_user_joined_channel(user_id, channel_id1)
     joined_channel2 = check_user_joined_channel(user_id, channel_id2)
+    joined_channel3 = check_user_joined_channel(user_id, channel_id3)
 
-    if joined_channel1 and joined_channel2:
+    if joined_channel1 and joined_channel2 and joined_channel3:
         bot.send_message(chat_id, welcome_message)
 
         # Custom reply keyboard
@@ -422,9 +425,11 @@ def send_welcome(message):
         markup = types.InlineKeyboardMarkup(row_width=2)
         join_button1 = types.InlineKeyboardButton(text="Kanal", url=f"https://t.me/{channel_id1[1:]}")
         join_button2 = types.InlineKeyboardButton(text="Chat", url=f"https://t.me/{channel_id2[1:]}")
+        join_button3 = types.InlineKeyboardButton(text="Kanal", url=f"https://t.me/{channel_id3[1:]}")
         confirm_button = types.InlineKeyboardButton(text="Tasdiqlash", callback_data="confirm")
 
         markup.add(join_button1)
+        markup.add(join_button3)
         markup.add(join_button2)
         markup.add(confirm_button)
 
@@ -799,10 +804,10 @@ def send_vip_channel_info(message):
 
 
     if joined_channel1 and joined_channel2:
-        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 30,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
+        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 15,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
     else:
         message_text = (
-            "Iltimos, ushbu xizmatdan foydalanish uchun ikkala kanalga ham obuna bo'ling:\n"
+            "Iltimos, ushbu xizmatdan foydalanish uchun ikkala  ham obuna bo'ling:\n"
             f"Kanal 1: {channel_id1}\n"
             f"Kanal 2: {channel_id2}\n"
         )
@@ -1065,5 +1070,7 @@ def handle_ad_content(message):
 
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
+
+
 
 bot.polling()
