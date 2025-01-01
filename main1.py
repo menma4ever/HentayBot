@@ -797,7 +797,7 @@ def send_vip_channel_info(message):
 
 
     if joined_channel1 and joined_channel2:
-        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 30,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
+        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 15,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
     else:
         message_text = (
             "Iltimos, ushbu xizmatdan foydalanish uchun ikkala kanalga ham obuna bo'ling:\n"
