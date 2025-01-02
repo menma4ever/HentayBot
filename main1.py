@@ -999,8 +999,7 @@ def give_premium(message):
 
 @bot.message_handler(commands=['ban'])
 def ban_command(message):
-    if message.from_user.id != admin:
-        bot.reply_to(message, "Sizda ushbu komandani ishlatish huquqi yo'q.")
+    if message.from_user.id != admin
         return
 
     if message.chat.type != 'private':
