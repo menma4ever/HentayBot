@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime, timedelta
 import time
-from keep_alive import keep_alive
+from keep_alive import keep_alive}
 keep_alive()
 
 # Bot tokeningizni kiritishingiz kerak
@@ -33,6 +33,29 @@ def update_user_data(user_id, user_name, user_username):
     else:
         return False
 
+
+
+@bot.message_handler(content_types=['new_chat_members', 'left_chat_member'])
+def handle_chat_members(message):
+    chat_id = message.chat.id
+
+    if chat_id != -1002366490514:
+        return
+
+    if message.content_type == 'new_chat_members':
+        for new_member in message.new_chat_members:
+            user_name = new_member.first_name
+            user_id = new_member.id
+            welcome_message = f"Welcum 🍾 [ {user_name} ](tg://user?id={user_id})"
+            bot.delete_message(chat_id, message.message_id)
+            bot.send_message(chat_id, welcome_message, parse_mode='Markdown', disable_web_page_preview=True)
+
+    elif message.content_type == 'left_chat_member':
+        user_name = message.left_chat_member.first_name
+        user_id = message.left_chat_member.id
+        farewell_message = f"Bye Bye 👋 [ {user_name} ](tg://user?id={user_id})"
+        bot.delete_message(chat_id, message.message_id)
+        bot.send_message(chat_id, farewell_message, parse_mode='Markdown', disable_web_page_preview=True)
 
 
 
@@ -401,12 +424,10 @@ def send_welcome(message):
     # Kanalga obuna bo'lganligini tekshirish
     channel_id1 = '@hentay_uz_official'
     channel_id2 = '@hentay_uz_chat'
-    channel_id3 = '@Anime_chat_aki'
     joined_channel1 = check_user_joined_channel(user_id, channel_id1)
     joined_channel2 = check_user_joined_channel(user_id, channel_id2)
-    joined_channel3 = check_user_joined_channel(user_id, channel_id3)
 
-    if joined_channel1 and joined_channel2 and joined_channel3:
+    if joined_channel1 and joined_channel2:
         bot.send_message(chat_id, welcome_message)
 
         # Custom reply keyboard
@@ -423,11 +444,9 @@ def send_welcome(message):
         markup = types.InlineKeyboardMarkup(row_width=2)
         join_button1 = types.InlineKeyboardButton(text="Kanal", url=f"https://t.me/{channel_id1[1:]}")
         join_button2 = types.InlineKeyboardButton(text="Chat", url=f"https://t.me/{channel_id2[1:]}")
-        join_button3 = types.InlineKeyboardButton(text="AKI", url=f"https://t.me/{channel_id3[1:]}")
         confirm_button = types.InlineKeyboardButton(text="✅Tasdiqlash", callback_data="confirm")
 
         markup.add(join_button1)
-        markup.add(join_button3)
         markup.add(join_button2)
         markup.add(confirm_button)
 
@@ -465,13 +484,11 @@ def confirm_subscription(call):
     user_id = str(call.from_user.id)
     channel_id1 = '@hentay_uz_official'
     channel_id2 = '@hentay_uz_chat'
-    channel_id3 = '@anime_chat_aki'
 
     joined_channel1 = check_user_joined_channel(user_id, channel_id1)
     joined_channel2 = check_user_joined_channel(user_id, channel_id2)
-    joined_channel3 = check_user_joined_channel(user_id, channel_id3)
 
-    if joined_channel1 and joined_channel2 and joined_channel3:
+    if joined_channel1 and joined_channel2:
         bot.answer_callback_query(call.id, "Obuna tasdiqlandi. Foydalanishni boshlashingiz mumkin.")
         send_welcome(call.message)  # Foydalanuvchi obuna bo'lgach, /start buyrug'ini qayta chaqirish
     else:
@@ -562,4 +579,513 @@ def get_anime_by_id(message):
                 f"🌍 Davlati: {anime['davlat']}\n"
                 f"🇺🇿 Tili: {anime['tili']}\n"
                 f"📆 Yili: {anime['yili']}\n"
-               
+                f"🎞 Janri: {anime['janri']}\n\n"
+                f"🔍 Qidirishlar soni: {anime['qidirishlar_soni']}\n\n"
+            )
+
+            inline_keyboard = types.InlineKeyboardMarkup()
+            download_button = types.InlineKeyboardButton("Yuklab olish", callback_data=f"start_download_{anime_id}_1")
+            inline_keyboard.add(download_button)
+
+            pfp = anime['pfp']
+            if pfp.startswith('http'):
+                bot.send_photo(chat_id, pfp, caption=anime_info, reply_markup=inline_keyboard)
+            else:
+                with open(pfp, 'rb') as photo:
+                    bot.send_photo(chat_id, photo, caption=anime_info, reply_markup=inline_keyboard)
+        else:
+            bot.send_message(chat_id, "Anime topilmadi. Iltimos, qayta urinib ko'ring.")
+
+        # Yangi qidiruv uchun qayta registratsiya qilish
+        msg = bot.send_message(chat_id, "Yangi anime kodini kiriting yoki Orqaga qayting.")
+        msg = bot.send_message(chat_id, "🎬 Reklama uchun murojat @Std_admin 📩")
+        bot.register_next_step_handler(msg, get_anime_by_id)
+    else:
+        message_text = (
+            "Iltimos, ushbu xizmatdan foydalanish uchun uchala kanalga ham obuna bo'ling:\n"
+            f"Kanal 1: {channel_id1}\n"
+            f"Kanal 2: {channel_id2}\n"
+        )
+        bot.send_message(chat_id, message_text)
+
+# Check user subscription status function
+def check_user_joined_channel(user_id, channel_id):
+    try:
+        chat_member = bot.get_chat_member(channel_id, user_id)
+        if chat_member.status in ['member', 'administrator', 'creator']:
+            return True
+        else:
+            return False
+    except:
+        return False
+
+
+
+
+
+
+
+
+import requests
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('start_download_'))
+def start_download_anime(call):
+    user_id = str(call.from_user.id)
+
+    # hentay_data.json faylini ochish
+    with open('hentay_data.json', 'r') as file:
+        anime_data = json.load(file)
+
+    for anime in anime_data:
+        anime_name = anime.get('nomi', 'Anime')
+        for qism, qism_path in anime.items():
+            if qism.isdigit() and call.data == f"start_download_{anime['id']}_{qism}":
+                caption = f"{anime_name}\n\n{qism} qism"
+                inline_keyboard = types.InlineKeyboardMarkup(row_width=2)
+                prev_qism = int(qism) - 1
+                next_qism = int(qism) + 1
+
+                # Oldingi qism tugmasini qo'shish
+                if str(prev_qism) in anime:
+                    prev_button = types.InlineKeyboardButton("Oldingi", callback_data=f"check_premium_prev_{anime['id']}_{prev_qism}")
+                else:
+                    prev_button = types.InlineKeyboardButton("Oldingi (yo'q)", callback_data="error_prev_not_found")
+                inline_keyboard.add(prev_button)
+
+                # Keyingi qism tugmasini qo'shish
+                if str(next_qism) in anime:
+                    next_button = types.InlineKeyboardButton("Keyingi", callback_data=f"check_premium_next_{anime['id']}_{next_qism}")
+                else:
+                    next_button = types.InlineKeyboardButton("Keyingi (yo'q)", callback_data="error_next_not_found")
+                inline_keyboard.add(next_button)
+
+                try:
+                    # URL manzilni olish va forward qilish
+                    if qism_path.startswith('https://t.me/'):
+                        chat_info = qism_path.replace('https://t.me/', '').split('/')
+                        chat_id = f"@{chat_info[0]}"
+                        message_id = int(chat_info[1])
+
+                        # Xabarni forward qilish
+                        forwarded_message = bot.forward_message(call.message.chat.id, chat_id, message_id)
+
+                        # Forward qilinganligini yashirish uchun xabar mazmunini qayta yuborish
+                        if forwarded_message.video:
+                            video_file_id = forwarded_message.video.file_id
+
+                            # Forward qilingan xabarni o'chirib, yangi xabar jo'natish
+                            bot.delete_message(call.message.chat.id, forwarded_message.message_id)
+                            bot.delete_message(call.message.chat.id, call.message.message_id)
+                            bot.send_video(
+                                call.message.chat.id, video_file_id, caption=caption, reply_markup=inline_keyboard,
+                                supports_streaming=True, protect_content=True
+                            )
+                        else:
+                            bot.send_message(call.message.chat.id, "Forward qilingan xabar video emas.")
+                    else:
+                        with open(qism_path, 'rb') as media_file:
+                            bot.delete_message(call.message.chat.id, call.message.message_id)
+                            bot.send_video(
+                                call.message.chat.id, media_file, caption=caption, reply_markup=inline_keyboard,
+                                supports_streaming=True, protect_content=True
+                            )
+                except Exception as e:
+                    bot.send_message(call.message.chat.id, f"Media yuklab olishda muammo: {e}")
+                return
+
+    bot.answer_callback_query(call.id, "Qism topilmadi.")
+
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('check_premium_'))
+def check_premium(call):
+    user_id = str(call.from_user.id)
+
+    # user_data.json faylini ochish
+    with open(user_data_file, 'r') as user_file:
+        user_data = json.load(user_file)
+
+    is_premium = user_data.get(user_id, {}).get('prem', False)
+
+    if not is_premium:
+        bot.answer_callback_query(call.id, "Premiumingiz mavjud emas.")
+        return
+
+    data_parts = call.data.split('_')
+    if len(data_parts) == 5:
+        action = data_parts[2]
+        anime_id = data_parts[3]
+        qism = data_parts[4]
+
+        # Qism mavjudligini tekshirish
+        with open('hentay_data.json', 'r') as file:
+            anime_data = json.load(file)
+
+        anime = next((item for item in anime_data if item["id"] == int(anime_id)), None)
+        if anime and str(qism) in anime:
+            # Keyingi yoki oldingi qismga o'tish
+            new_call_data = f"start_download_{anime_id}_{qism}"
+            new_call = call
+            new_call.data = new_call_data
+            start_download_anime(new_call)
+        else:
+            if action == 'next':
+                bot.answer_callback_query(call.id, "Keyingi qism mavjud emas.")
+            elif action == 'prev':
+                bot.answer_callback_query(call.id, "Oldingi qism mavjud emas.")
+    else:
+        bot.answer_callback_query(call.id, "Xato yuz berdi.")
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('error'))
+def handle_errors(call):
+    error_messages = {
+        "error_no_premium": "Premiumingiz mavjud emas.",
+        "error_prev_not_found": "Oldingi qism yo'q.",
+        "error_next_not_found": "Keyingi qism yo'q."
+    }
+    bot.answer_callback_query(call.id, error_messages.get(call.data, "Xato yuz berdi."))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@bot.message_handler(func=lambda message: message.text == 'Orqaga' and message.chat.type == 'private')
+def go_back(message):
+    chat_id = message.chat.id
+
+    # Eski reply keyboardni qayta tiklash
+    keyboard = telebot.types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton('🔍 Hentay izlash')
+    button2 = telebot.types.KeyboardButton('🔞 Premium ')
+    button3 = telebot.types.KeyboardButton("📚 Malumot")
+    button4 = telebot.types.KeyboardButton('💵 Reklama va Homiylik')
+    keyboard.row(button1)
+    keyboard.row(button2, button3, button4)
+
+    bot.send_message(chat_id, "Orqaga qaytdingiz.", reply_markup=keyboard)
+
+
+
+@bot.message_handler(commands=['restart'])
+def restart_user(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+    user_name = message.from_user.first_name
+    user_username = message.from_user.username
+
+    if update_user_data(user_id, user_name, user_username):
+        bot.send_message(chat_id, "Ma'lumotlaringiz yangilandi 😊")
+    else:
+        inline_keyboard = telebot.types.InlineKeyboardMarkup()
+        private_button = telebot.types.InlineKeyboardButton("Botga O'tish", url=f't.me/{bot.get_me().username}?start')
+        inline_keyboard.add(private_button)
+        bot.send_message(chat_id, "Siz botda registratsiya qilmagansiz 😊", reply_markup=inline_keyboard)
+
+def update_user_data(user_id, user_name, user_username):
+    with open(user_data_file, 'r+') as file:
+        data = json.load(file)
+        if user_id in data:
+            data[user_id]['name'] = user_name
+            data[user_id]['username'] = user_username
+            file.seek(0)
+            json.dump(data, file, indent=4)  # Ma'lumotlarni faylga saqlashda indent parametri bilan
+            file.truncate()  # Foylani qisqartirish, ortiqcha qismlarini olib tashlash
+            return True
+        return False
+
+
+
+@bot.message_handler(func=lambda message: message.text == '🔞 Premium' and message.chat.type == 'private')
+def send_vip_channel_info(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+
+    # Kanalga obuna bo'lganligini tekshirish
+    channel_id1 = '@hentay_uz_official'
+    channel_id2 = '@hentay_uz_chat'
+
+    joined_channel1 = check_user_joined_channel(user_id, channel_id1)
+    joined_channel2 = check_user_joined_channel(user_id, channel_id2)
+
+
+    if joined_channel1 and joined_channel2:
+        bot.send_message(chat_id, "🔞 Premium 🔞\n\n 💸 15,000 so'm \n\n✅ Hentai barcha qismlariga ega bo'lish \n✅ Reklamalardan butunlay ozodlik \n✅ Premium kanallarga imkon \n\n🕔 1 oy davomida \n👤 admin: @Std_admin")
+    else:
+        message_text = (
+            "Iltimos, ushbu xizmatdan foydalanish uchun ikkala  ham obuna bo'ling:\n"
+            f"Kanal 1: {channel_id1}\n"
+            f"Kanal 2: {channel_id2}\n"
+        )
+        bot.send_message(chat_id, message_text)
+
+
+@bot.message_handler(func=lambda message: message.text == "📚 Malumot" and message.chat.type == 'private')
+def send_qollanma_info(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+
+    # Kanalga obuna bo'lganligini tekshirish
+    channel_id1 = '@hentay_uz_official'
+    channel_id2 = '@hentay_uz_chat'
+
+    joined_channel1 = check_user_joined_channel(user_id, channel_id1)
+    joined_channel2 = check_user_joined_channel(user_id, channel_id2)
+
+
+    if joined_channel1 and joined_channel2:
+        # Malumotlarni yuborish
+        info_message = (
+            "*Yangiliklar:*\n"
+            "Bizning eng sara va sifatli yangi anime loyihalarimizni Telegram kanalimizda e'lon qilamiz! Har bir anime o'ziga xos va qiziqarli bo'lib, sizni hayratda qoldiradi. 🎉\n\n"
+
+            "*ID orqali qidirish:*\n"
+            "Mukammal tuzilgan ID tizimimiz orqali yangi jentaklarni tez va oson toping. Bu sizga kerakli ma'lumotlarni tezda topishga yordam beradi. 🔍\n\n"
+
+            "*Reklama imkoniyatlari:*\n"
+            "Bizning arzon va ishonchli reklama turlarimizdan foydalaning va yangiliklardan xabardor bo'ling! Reklama joylashtirish uchun biz bilan bog'laning va o'z biznesingizni rivojlantiring. 📈\n\n"
+
+            "*Qo'shimcha afzalliklar:*\n"
+            "- **Yuqori sifat:** Bizning anime loyihalarimiz yuqori sifatli va qiziqarli bo'lib, sizni hayratda qoldiradi.\n"
+            "- **Tezkor qidiruv:** ID tizimi orqali kerakli ma'lumotlarni tezda toping.\n"
+            "- **Arzon reklama:** Bizning reklama turlarimiz arzon va ishonchli, bu sizga biznesingizni rivojlantirishda yordam beradi.\n"
+        )
+        bot.send_message(chat_id, info_message, parse_mode='Markdown')
+    else:
+        message_text = (
+            "Iltimos, ushbu xizmatdan foydalanish uchun ikkala kanalga ham obuna bo'ling:\n"
+            f"Kanal 1: {channel_id1}\n"
+            f"Kanal 2: {channel_id2}\n"
+        )
+        bot.send_message(chat_id, message_text)
+
+
+
+@bot.message_handler(func=lambda message: message.text == "💵 Reklama va Homiylik" and message.chat.type == 'private')
+def send_homiylik_info(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+
+    # Kanalga obuna bo'lganligini tekshirish
+    channel_id1 = '@hentay_uz_official'
+    channel_id2 = '@hentay_uz_chat'
+
+    joined_channel1 = check_user_joined_channel(user_id, channel_id1)
+    joined_channel2 = check_user_joined_channel(user_id, channel_id2)
+
+
+    if joined_channel1 and joined_channel2:
+        bot.send_message(chat_id, "💵 Reklama va Homiylik uchun @Std_admin")
+    else:
+        message_text = (
+            "Iltimos, ushbu xizmatdan foydalanish uchun ikkala kanalga ham obuna bo'ling:\n"
+            f"Kanal 1: https://t.me/{channel_id1}\n"
+            f"Kanal 2: https://t.me/{channel_id2}"
+        )
+        bot.send_message(chat_id, message_text)
+
+
+
+@bot.message_handler(commands=['profile'])
+def show_profile(message):
+    chat_id = message.chat.id
+    user_id = str(message.from_user.id)
+
+    with open(user_data_file, 'r') as file:
+        data = json.load(file)
+
+    if user_id in data:
+        user_info = data[user_id]
+        prem_status = "😊 Mavjud" if user_info['prem'] else "😞 Mavjud emas"
+
+        if user_info['prem_time'] > 0:
+            premium_end_time = datetime.now() + timedelta(seconds=user_info['prem_time'])
+            prem_time_remaining = premium_end_time - datetime.now()
+            days, remainder = divmod(prem_time_remaining.total_seconds(), 86400)
+            hours, remainder = divmod(remainder, 3600)
+            minutes, _ = divmod(remainder, 60)
+            prem_time = f"😃 {int(days)} kun {int(hours)} soat {int(minutes)} minut"
+        else:
+            prem_time = "😞 Mavjud emas"
+
+        profile_message = (
+            f"Ism: 😊 {user_info['name']} \n"
+            f"Username: 😊 @{user_info['username']} \n"
+            f"Premium status: {prem_status} \n"
+            f"Premium vaqti: {prem_time} \n\n"
+            f"/restart - Profilingizni yangilash uchun 🔄"
+        )
+    else:
+        inline_keyboard = telebot.types.InlineKeyboardMarkup()
+        private_button = telebot.types.InlineKeyboardButton("Botga O'tish", url=f't.me/hentay_uz_bot')
+        inline_keyboard.add(private_button)
+        profile_message = "Siz botda registratsiya qilmagansiz 😊"
+
+    bot.reply_to(message, profile_message, reply_markup=inline_keyboard if 'inline_keyboard' in locals() else None)
+
+
+
+admin = 7577190183  # Ro'yxatga boshqa adminlar IDlarini qo'shing
+
+
+import threading
+import time
+
+@bot.message_handler(commands=['give'])
+def give_premium(message):
+    if message.from_user.id != admin:
+        bot.reply_to(message, "Sizda ushbu komandani ishlatish huquqi yo'q.")
+        return
+
+    if not message.reply_to_message:
+        bot.reply_to(message, "Ushbu komandani ishlatish uchun foydalanuvchiga reply qiling.")
+        return
+
+    user_id = str(message.reply_to_message.from_user.id)
+
+    with open(user_data_file, 'r') as user_file:
+        user_data = json.load(user_file)
+
+    if user_id not in user_data:
+        bot.reply_to(message, "Ushbu foydalanuvchi ma'lumotlar bazasida topilmadi.")
+        return
+
+    if user_data[user_id].get('prem', False):
+        bot.reply_to(message, f"{message.reply_to_message.from_user.first_name} allaqachon premium maqomiga ega.")
+        return
+
+    user_data[user_id]['prem'] = True
+    user_data[user_id]['prem_time'] = 30 * 24 * 60 * 60  # 30 kun
+
+    with open(user_data_file, 'w') as user_file:
+        json.dump(user_data, user_file, indent=4)
+
+    bot.reply_to(message, f"{message.reply_to_message.from_user.first_name} premium maqomiga ega bo'ldi.")
+
+    # Thread yordamida prem_time ni kamaytirib borish
+    def decrease_prem_time(user_id):
+        while user_data[user_id]['prem_time'] > 0:
+            time.sleep(1)
+            user_data[user_id]['prem_time'] -= 1
+
+            with open(user_data_file, 'w') as user_file:
+                json.dump(user_data, user_file, indent=4)
+
+        user_data[user_id]['prem'] = False
+
+        with open(user_data_file, 'w') as user_file:
+            json.dump(user_data, user_file, indent=4)
+
+        # Foydalanuvchiga prem tugaganini bildirish
+        try:
+            bot.send_message(user_id, "Premium muddati tugadi. Qayta olish uchun @seevar_06 ga murojaat qiling.")
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                bot.send_message(admin[0], f"Foydalanuvchi {user_id} botni blok qilgan. Unga xabar yuborilmadi.")
+
+    threading.Thread(target=decrease_prem_time, args=(user_id,)).start()
+
+
+
+@bot.message_handler(commands=['ban'])
+def ban_command(message):
+    if message.from_user.id != admin:
+        bot.reply_to(message, "Sizda ushbu komandani ishlatish huquqi yo'q.")
+        return
+
+    if message.chat.type != 'private':
+        bot.reply_to(message, "Ushbu komanda faqat private chatlarda ishlaydi.")
+        return
+
+    bot.reply_to(message, "Botni bloklagan foydalanuvchilarni o'chirishni boshlaymiz.")
+
+    with open(user_data_file, 'r') as user_file:
+        user_data = json.load(user_file)
+
+    blocked_users = []
+
+    for user_id in list(user_data.keys()):
+        try:
+            bot.send_chat_action(user_id, 'typing')  # Foydalanuvchi botni bloklamaganligini tekshirish
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                blocked_users.append(user_id)
+                user_link = f"https://t.me/{user_id}"
+                user_name = user_data[user_id].get('username', 'No username')
+                bot.send_message(admin, f"Foydalanuvchi @{user_name} bloklagan: {user_link}")
+                del user_data[user_id]
+
+    with open(user_data_file, 'w') as user_file:
+        json.dump(user_data, user_file, indent=4)
+
+    bot.send_message(admin, "Bloklagan foydalanuvchilar o'chirildi.")
+
+
+
+
+is_ad_active = False
+
+@bot.message_handler(commands=['ad'])
+def ad_command(message):
+    global is_ad_active
+    if message.from_user.id != admin:
+        bot.reply_to(message, "Sizda ushbu komandani ishlatish huquqi yo'q.")
+        return
+
+    if message.chat.type != 'private':
+        bot.reply_to(message, "Ushbu komanda faqat private chatlarda ishlaydi.")
+        return
+
+    is_ad_active = True
+    bot.reply_to(message, "Reklama matnini, videoni, rasmni yoki gifni yuboring.")
+
+@bot.message_handler(content_types=['text', 'photo', 'video', 'animation'])
+def handle_ad_content(message):
+    global is_ad_active
+    if message.from_user.id != admin:
+        return
+
+    if message.chat.type != 'private':
+        return
+
+    if not is_ad_active:
+        return
+
+    with open(user_data_file, 'r') as user_file:
+        user_data = json.load(user_file)
+
+    for user_id, user_info in user_data.items():
+        try:
+            if user_info.get('prem', False):
+                bot.send_message(user_id, "Exx sz Premium user ekansz reklama kelgan edi-ya. 😁🎉")
+                continue
+
+            if message.content_type == 'text':
+                bot.send_message(user_id, message.text)
+            elif message.content_type == 'photo':
+                bot.send_photo(user_id, message.photo[-1].file_id, caption=message.caption)
+            elif message.content_type == 'video':
+                bot.send_video(user_id, message.video.file_id, caption=message.caption)
+            elif message.content_type == 'animation':
+                bot.send_animation(user_id, message.animation.file_id, caption=message.caption)
+        except telebot.apihelper.ApiTelegramException as e:
+            if e.error_code == 403:
+                bot.send_message(admin, f"Foydalanuvchi {user_id} botni blok qilgan. Unga xabar yuborilmadi.")
+            else:
+                bot.send_message(admin, f"Foydalanuvchi {user_id} ga reklama yuborishda xatolik yuz berdi: {e}")
+
+    is_ad_active = False
+    bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
+
+
+bot.polling()
