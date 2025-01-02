@@ -999,7 +999,7 @@ def give_premium(message):
 
 @bot.message_handler(commands=['ban'])
 def ban_command(message):
-    if message.from_user.id != admin
+    if message.from_user.id != admin:
         return
 
     if message.chat.type != 'private':
