@@ -1088,4 +1088,5 @@ def handle_ad_content(message):
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
 
 
+
 bot.polling()
