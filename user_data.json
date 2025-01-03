@@ -94,7 +94,7 @@
         "name": "Abdulaziz",
         "username": "menma4ever",
         "joined_at": 1735491434.6632295,
-        "prem": true,
+        "prem": false,
         "prem_time": 0
     },
     "7018831591": {
@@ -223,13 +223,6 @@
         "prem": false,
         "prem_time": 0
     },
-    "5229538116": {
-        "name": "\u9886\u5bfc\u2022|senpai\u30b7",
-        "username": "Senpai4ever",
-        "joined_at": 1735763319.1956937,
-        "prem": false,
-        "prem_time": 0
-    },
     "7072082721": {
         "name": "Davlatshox",
         "username": null,
@@ -318,6 +311,69 @@
         "name": "\ud835\udcd5\ud835\udcea\ud835\udcfb\ud835\udcfb\ud835\udcfe\ud835\udcf1\ud83e\udec0",
         "username": null,
         "joined_at": 1735835257.9437852,
+        "prem": false,
+        "prem_time": 0
+    },
+    "7426329057": {
+        "name": "\u2664",
+        "username": "d100000k",
+        "joined_at": 1735843399.380169,
+        "prem": false,
+        "prem_time": 0
+    },
+    "5030953418": {
+        "name": "Admin",
+        "username": "Hanime_admin",
+        "joined_at": 1735843399.9842467,
+        "prem": false,
+        "prem_time": 0
+    },
+    "7877036827": {
+        "name": "Javohir",
+        "username": null,
+        "joined_at": 1735894225.441621,
+        "prem": false,
+        "prem_time": 0
+    },
+    "6898494244": {
+        "name": "Asilbek",
+        "username": "mominovasilbek31",
+        "joined_at": 1735894780.6392512,
+        "prem": false,
+        "prem_time": 0
+    },
+    "5295144964": {
+        "name": "Azizbek\ud83d\ude0e\ud83c\udfa7",
+        "username": "fer3gana",
+        "joined_at": 1735897391.7653563,
+        "prem": false,
+        "prem_time": 0
+    },
+    "1997458831": {
+        "name": "honey",
+        "username": "wasirenaio",
+        "joined_at": 1735904812.502809,
+        "prem": false,
+        "prem_time": 0
+    },
+    "7592263466": {
+        "name": "Senpai",
+        "username": "Senpai_himetsu",
+        "joined_at": 1735908389.752709,
+        "prem": false,
+        "prem_time": 0
+    },
+    "1150034136": {
+        "name": "002 Partner killer",
+        "username": "enemyofeternity",
+        "joined_at": 1735908467.1340556,
+        "prem": false,
+        "prem_time": 0
+    },
+    "5229538116": {
+        "name": "\u9886\u5bfc\u2022|senpai\u30b7",
+        "username": "Senpai4ever",
+        "joined_at": 1735908994.792516,
         "prem": false,
         "prem_time": 0
     }
