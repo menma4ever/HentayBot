@@ -423,7 +423,7 @@ def send_welcome(message):
     else:
         user_name = message.from_user.first_name
         user_username = message.from_user.username
-        save_user_data(user_id, user_name, user_username)
+        update_user_data(user_id, user_name, user_username)
         welcome_message = "Hentay botimizga hush kelibsiz, foydalanish uchun pastdagi tugmalardan foydalaning 😊"
         data[user_id] = {
             'name': user_name,
@@ -1074,6 +1074,7 @@ def handle_ad_content(message):
 
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
+
 
 
 
