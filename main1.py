@@ -425,6 +425,15 @@ def send_welcome(message):
         user_username = message.from_user.username
         save_user_data(user_id, user_name, user_username)
         welcome_message = "Hentay botimizga hush kelibsiz, foydalanish uchun pastdagi tugmalardan foydalaning 😊"
+        data[user_id] = {
+            'name': user_name,
+            'username': user_username,
+            'joined_at': time.time(),
+            'prem': False,
+            'prem_time': 0
+        }
+        with open(user_data_file, 'w') as file:
+            json.dump(data, file, indent=4)
 
     # Kanalga obuna bo'lganligini tekshirish
     channel_id1 = '@hentay_uz_official'
@@ -457,32 +466,6 @@ def send_welcome(message):
 
         bot.send_message(chat_id, "Iltimos, foydalanishdan oldin quyidagi kanallarga obuna bo'ling:", reply_markup=markup)
 
-
-# Check user subscription status
-def check_user_joined_channel(user_id, channel_id):
-    try:
-        chat_member = bot.get_chat_member(channel_id, user_id)
-        if chat_member.status in ['member', 'administrator', 'creator']:
-            return True
-        else:
-            return False
-    except:
-        return False
-
-# Save user data function
-def save_user_data(user_id, user_name, user_username):
-    with open(user_data_file, 'r+') as file:
-        data = json.load(file)
-        if user_id not in data:
-            data[user_id] = {
-                'name': user_name,
-                'username': user_username,
-                'joined_at': time.time(),
-                'prem': False,
-                'prem_time': 0
-            }
-            file.seek(0)
-            json.dump(data, file, indent=4)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "confirm")
@@ -1091,7 +1074,6 @@ def handle_ad_content(message):
 
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
-
 
 
 
