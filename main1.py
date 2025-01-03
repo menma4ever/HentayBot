@@ -62,6 +62,7 @@ def handle_chat_members(message):
 
 # List of admin user IDs (Replace with actual IDs)
 admins = [7577190183]
+admin = 7577190183
 
 @bot.message_handler(commands=['post'])
 def handle_post(message):
@@ -934,8 +935,7 @@ def show_profile(message):
     bot.reply_to(message, profile_message, reply_markup=inline_keyboard if 'inline_keyboard' in locals() else None)
 
 
-
-admin = 7577190183  # Ro'yxatga boshqa adminlar IDlarini qo'shing
+  # Ro'yxatga boshqa adminlar IDlarini qo'shing
 
 
 import threading
@@ -1000,6 +1000,7 @@ def give_premium(message):
 @bot.message_handler(commands=['ban'])
 def ban_command(message):
     if message.from_user.id != admin:
+        bot.reply_to(message, "Sizda ushbu komandani ishlatish huquqi yo'q.")
         return
 
     if message.chat.type != 'private':
@@ -1085,7 +1086,6 @@ def handle_ad_content(message):
 
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
-
 
 
 bot.polling()
