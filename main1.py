@@ -409,9 +409,13 @@ def send_welcome(message):
 
     user_id = str(message.from_user.id)
 
-    # user_data.json faylini ochish
-    with open(user_data_file, 'r') as file:
-        data = json.load(file)
+    try:
+        # user_data.json faylini ochish
+        with open(user_data_file, 'r') as file:
+            data = json.load(file)
+    except json.JSONDecodeError as e:
+        bot.send_message(chat_id, f"JSON faylida xatolik bor /start bosin: {e}")
+        return
 
     if user_id in data:
         user_name = data[user_id]['name']
@@ -452,6 +456,7 @@ def send_welcome(message):
         markup.add(confirm_button)
 
         bot.send_message(chat_id, "Iltimos, foydalanishdan oldin quyidagi kanallarga obuna bo'ling:", reply_markup=markup)
+
 
 # Check user subscription status
 def check_user_joined_channel(user_id, channel_id):
@@ -1086,6 +1091,8 @@ def handle_ad_content(message):
 
     is_ad_active = False
     bot.send_message(admin, "Reklama barcha foydalanuvchilarga yuborildi.")
+
+
 
 
 bot.polling()
